@@ -1,7 +1,7 @@
-resource "accumulator_group" "example" {}
+data "accumulator_group" "example" {}
 
 resource "accumulator_item" "item" {
-    group = accumulator_group.example.id
+    group = data.accumulator_group.example.id
     key = "example"
     value = "example value"
 }
@@ -13,5 +13,5 @@ output "expected" {
 }
 
 output "got" {
-  value = accumulator_group.example.value
+  value = data.accumulator_group.example.value
 }

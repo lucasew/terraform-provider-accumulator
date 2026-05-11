@@ -2,6 +2,9 @@ package provider
 
 import (
 	"context"
+	"fmt"
+	"log/slog"
+	"sync/atomic"
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/provider"
@@ -15,14 +18,21 @@ type AccumulatorProvider struct {
 	// testing.
 	version string
 	store   AccumulatorStore
+	id      uint64
 }
 
 type providerData struct {
 	store AccumulatorStore
 }
 
+var nextProviderID atomic.Uint64
+
 // Configure implements [provider.Provider].
 func (p *AccumulatorProvider) Configure(_ context.Context, _ provider.ConfigureRequest, resp *provider.ConfigureResponse) {
+	slog.Debug("provider.Configure", "provider_id", p.id, "store_type", fmt.Sprintf("%T", p.store))
+	resp.DataSourceData = &providerData{
+		store: p.store,
+	}
 	resp.ResourceData = &providerData{
 		store: p.store,
 	}
@@ -30,7 +40,11 @@ func (p *AccumulatorProvider) Configure(_ context.Context, _ provider.ConfigureR
 
 // DataSources implements [provider.Provider].
 func (p *AccumulatorProvider) DataSources(context.Context) []func() datasource.DataSource {
-	return nil
+	return []func() datasource.DataSource{
+		func() datasource.DataSource {
+			return &GroupDataSource{}
+		},
+	}
 }
 
 // Schema implements [provider.Provider].
@@ -44,9 +58,6 @@ func (p *AccumulatorProvider) Metadata(_ context.Context, _ provider.MetadataReq
 func (p *AccumulatorProvider) Resources(_ context.Context) []func() resource.Resource {
 	return []func() resource.Resource{
 		func() resource.Resource {
-			return &GroupResource{}
-		},
-		func() resource.Resource {
 			return &ItemResource{}
 		},
 	}
@@ -54,9 +65,11 @@ func (p *AccumulatorProvider) Resources(_ context.Context) []func() resource.Res
 
 func New(version string) func() provider.Provider {
 	return func() provider.Provider {
+		providerID := nextProviderID.Add(1)
 		return &AccumulatorProvider{
 			version: version,
-			store:   NewStore(),
+			store:   NewLoggingStore(fmt.Sprintf("provider-%d", providerID), NewStore()),
+			id:      providerID,
 		}
 	}
 }

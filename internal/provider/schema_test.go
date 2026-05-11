@@ -4,19 +4,20 @@ import (
 	"context"
 	"testing"
 
+	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 )
 
-func TestGroupResourceSchemaExposesAccumulatorFields(t *testing.T) {
-	group := &GroupResource{}
-	var resp resource.SchemaResponse
+func TestGroupDataSourceSchemaExposesAccumulatorFields(t *testing.T) {
+	group := &GroupDataSource{}
+	var resp datasource.SchemaResponse
 
-	group.Schema(context.Background(), resource.SchemaRequest{}, &resp)
+	group.Schema(context.Background(), datasource.SchemaRequest{}, &resp)
 
 	required := []string{"id", "value"}
 	for _, name := range required {
 		if _, ok := resp.Schema.Attributes[name]; !ok {
-			t.Fatalf("expected group schema to include %q", name)
+			t.Fatalf("expected group data source schema to include %q", name)
 		}
 	}
 }

@@ -9,6 +9,7 @@ import (
 
 type AccumulatorStore interface {
 	CreateGroup() (uuid.UUID, error)
+	EnsureGroup() (uuid.UUID, map[string]any, error)
 	DeleteGroup(id uuid.UUID) error
 	PutItem(groupID uuid.UUID, key string, value any) error
 	DeleteItem(groupID uuid.UUID, key string) error
@@ -16,8 +17,9 @@ type AccumulatorStore interface {
 }
 
 type MemoryStore struct {
-	mu     sync.RWMutex
-	groups map[uuid.UUID]map[string]any
+	mu      sync.RWMutex
+	groupID uuid.UUID
+	groups  map[uuid.UUID]map[string]any
 }
 
 func NewStore() AccumulatorStore {
@@ -31,9 +33,33 @@ func (s *MemoryStore) CreateGroup() (uuid.UUID, error) {
 	defer s.mu.Unlock()
 
 	id := uuid.New()
+	s.groupID = id
 	s.groups[id] = map[string]any{}
 
 	return id, nil
+}
+
+func (s *MemoryStore) EnsureGroup() (uuid.UUID, map[string]any, error) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	if s.groupID == uuid.Nil {
+		s.groupID = uuid.New()
+		s.groups[s.groupID] = map[string]any{}
+	}
+
+	group, ok := s.groups[s.groupID]
+	if !ok {
+		s.groups[s.groupID] = map[string]any{}
+		group = s.groups[s.groupID]
+	}
+
+	out := make(map[string]any, len(group))
+	for key, value := range group {
+		out[key] = value
+	}
+
+	return s.groupID, out, nil
 }
 
 func (s *MemoryStore) DeleteGroup(id uuid.UUID) error {
@@ -93,4 +119,21 @@ func (s *MemoryStore) GroupData(groupID uuid.UUID) (map[string]any, error) {
 	}
 
 	return out, nil
+}
+
+func (s *MemoryStore) Snapshot() map[string]map[string]any {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+
+	out := make(map[string]map[string]any, len(s.groups))
+	for groupID, group := range s.groups {
+		groupCopy := make(map[string]any, len(group))
+		for key, value := range group {
+			groupCopy[key] = value
+		}
+
+		out[groupID.String()] = groupCopy
+	}
+
+	return out
 }

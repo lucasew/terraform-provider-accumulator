@@ -4,6 +4,8 @@ import (
 	"context"
 	"embed"
 	"fmt"
+	"log/slog"
+	"os"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -16,6 +18,12 @@ import (
 
 //go:embed testdata/*
 var testdata embed.FS
+
+func init() {
+	slog.SetDefault(slog.New(slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{
+		Level: slog.LevelDebug,
+	})))
+}
 
 func TestAccCases(t *testing.T) {
 	items, err := testdata.ReadDir("testdata")
