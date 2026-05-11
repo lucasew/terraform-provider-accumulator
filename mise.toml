@@ -2,6 +2,8 @@
 go = "1.26.3"
 "go:golang.org/x/tools/gopls" = "0.21.1"
 
+[env]
+# Note for LMMs: don't touch GOCACHE, it's just your sandbox that doesn't allow the default location.
 
 [tasks.fmt]
 description = "Format Go sources"

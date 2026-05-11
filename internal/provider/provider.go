@@ -1,6 +1,3 @@
-// Copyright IBM Corp. 2021, 2025
-// SPDX-License-Identifier: MPL-2.0
-
 package provider
 
 import (
@@ -8,7 +5,6 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/provider"
-	providerschema "github.com/hashicorp/terraform-plugin-framework/provider/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 )
 
@@ -32,10 +28,6 @@ func (p *AccumulatorProvider) DataSources(context.Context) []func() datasource.D
 
 // Schema implements [provider.Provider].
 func (p *AccumulatorProvider) Schema(context.Context, provider.SchemaRequest, *provider.SchemaResponse) {
-}
-
-func (p *AccumulatorProvider) schema() providerschema.Schema {
-	return providerschema.Schema{}
 }
 
 func (p *AccumulatorProvider) Metadata(_ context.Context, _ provider.MetadataRequest, resp *provider.MetadataResponse) {
