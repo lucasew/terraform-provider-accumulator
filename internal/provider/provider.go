@@ -17,8 +17,15 @@ type AccumulatorProvider struct {
 	store   AccumulatorStore
 }
 
+type providerData struct {
+	store AccumulatorStore
+}
+
 // Configure implements [provider.Provider].
-func (p *AccumulatorProvider) Configure(context.Context, provider.ConfigureRequest, *provider.ConfigureResponse) {
+func (p *AccumulatorProvider) Configure(_ context.Context, _ provider.ConfigureRequest, resp *provider.ConfigureResponse) {
+	resp.ResourceData = &providerData{
+		store: p.store,
+	}
 }
 
 // DataSources implements [provider.Provider].
@@ -37,10 +44,10 @@ func (p *AccumulatorProvider) Metadata(_ context.Context, _ provider.MetadataReq
 func (p *AccumulatorProvider) Resources(_ context.Context) []func() resource.Resource {
 	return []func() resource.Resource{
 		func() resource.Resource {
-			return &GroupResource{store: p.store}
+			return &GroupResource{}
 		},
 		func() resource.Resource {
-			return &ItemResource{store: p.store}
+			return &ItemResource{}
 		},
 	}
 }

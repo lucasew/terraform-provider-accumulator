@@ -2,6 +2,7 @@ package provider
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/google/uuid"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -11,6 +12,23 @@ import (
 
 type GroupResource struct {
 	store AccumulatorStore
+}
+
+func (r *GroupResource) Configure(_ context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
+	if req.ProviderData == nil {
+		return
+	}
+
+	data, ok := req.ProviderData.(*providerData)
+	if !ok {
+		resp.Diagnostics.AddError(
+			"Unexpected Resource Configure Type",
+			fmt.Sprintf("Expected *providerData, got: %T", req.ProviderData),
+		)
+		return
+	}
+
+	r.store = data.store
 }
 
 // Create implements [resource.Resource].

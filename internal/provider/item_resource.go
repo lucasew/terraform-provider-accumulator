@@ -14,6 +14,23 @@ type ItemResource struct {
 	store AccumulatorStore
 }
 
+func (r *ItemResource) Configure(_ context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
+	if req.ProviderData == nil {
+		return
+	}
+
+	data, ok := req.ProviderData.(*providerData)
+	if !ok {
+		resp.Diagnostics.AddError(
+			"Unexpected Resource Configure Type",
+			fmt.Sprintf("Expected *providerData, got: %T", req.ProviderData),
+		)
+		return
+	}
+
+	r.store = data.store
+}
+
 // Create implements [resource.Resource].
 func (r *ItemResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
 	var plan itemModel

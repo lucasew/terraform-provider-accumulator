@@ -8,7 +8,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 )
 
-func TestNewInitializesProviderWithStore(t *testing.T) {
+func TestNewInitializesProvider(t *testing.T) {
 	providerFactory := New("test")
 	instance := providerFactory()
 
@@ -18,7 +18,31 @@ func TestNewInitializesProviderWithStore(t *testing.T) {
 	}
 
 	if accumulatorProvider.store == nil {
-		t.Fatal("expected provider store to be initialized")
+		t.Fatal("expected provider instance to initialize its own store")
+	}
+}
+
+func TestProviderConfigureExposesResourceData(t *testing.T) {
+	instance := New("test")()
+	accumulatorProvider, ok := instance.(*AccumulatorProvider)
+	if !ok {
+		t.Fatalf("expected *AccumulatorProvider, got %T", instance)
+	}
+
+	var resp provider.ConfigureResponse
+	accumulatorProvider.Configure(context.Background(), provider.ConfigureRequest{}, &resp)
+
+	data, ok := resp.ResourceData.(*providerData)
+	if !ok {
+		t.Fatalf("expected *providerData, got %T", resp.ResourceData)
+	}
+
+	if data.store == nil {
+		t.Fatal("expected configured provider data to include a store")
+	}
+
+	if data.store != accumulatorProvider.store {
+		t.Fatal("expected configured provider data to expose the provider instance store")
 	}
 }
 
@@ -63,12 +87,12 @@ func TestProviderResourcesReturnGroupAndItem(t *testing.T) {
 	}
 
 	group := gotTypes[0].(*GroupResource)
-	if group.store == nil {
-		t.Fatal("expected group resource to receive provider store")
+	if group.store != nil {
+		t.Fatal("expected group resource store to be injected during Configure")
 	}
 
 	item := gotTypes[1].(*ItemResource)
-	if item.store == nil {
-		t.Fatal("expected item resource to receive provider store")
+	if item.store != nil {
+		t.Fatal("expected item resource store to be injected during Configure")
 	}
 }
