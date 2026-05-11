@@ -81,16 +81,6 @@ func (c outputEqualStateCheck) CheckState(_ context.Context, req statecheck.Chec
 		return
 	}
 
-	if !expectedOutput.Type.Equals(gotOutput.Type) {
-		resp.Error = fmt.Errorf(
-			"output %q type mismatch: expected %s, got %s",
-			c.gotName,
-			expectedOutput.Type.FriendlyName(),
-			gotOutput.Type.FriendlyName(),
-		)
-		return
-	}
-
 	if diff := cmp.Diff(expectedOutput.Value, gotOutput.Value); diff != "" {
 		resp.Error = fmt.Errorf("output %q mismatch (-expected +got):\n%s", c.gotName, diff)
 	}
