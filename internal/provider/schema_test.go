@@ -13,7 +13,7 @@ func TestGroupResourceSchemaExposesAccumulatorFields(t *testing.T) {
 
 	group.Schema(context.Background(), resource.SchemaRequest{}, &resp)
 
-	required := []string{"id", "name", "type", "data"}
+	required := []string{"id", "name", "type", "value"}
 	for _, name := range required {
 		if _, ok := resp.Schema.Attributes[name]; !ok {
 			t.Fatalf("expected group schema to include %q", name)

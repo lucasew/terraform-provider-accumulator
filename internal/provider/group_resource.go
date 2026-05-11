@@ -5,7 +5,6 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
-	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
 type GroupResource struct {
@@ -51,10 +50,9 @@ func (r *GroupResource) Schema(_ context.Context, _ resource.SchemaRequest, resp
 				Optional:    true,
 				Description: "Optional value type enforced for all items in the group.",
 			},
-			"data": schema.MapAttribute{
+			"value": schema.DynamicAttribute{
 				Computed:    true,
-				ElementType: types.DynamicType,
-				Description: "Computed map assembled from all items in the group.",
+				Description: "Computed value assembled from all items in the group.",
 			},
 		},
 	}
