@@ -1,4 +1,4 @@
-# Terraform provider to allow one to define a variable by parts
+# Terraform provider to allow one to define a map variable by parts
 
 ## The problem
 Sometimes you have one resource, one config file or one something that is built from stuff on other files. For example: a shared hosts file generated from nodes defined in different places, or a ts-proxy service list from many small services. The idea here is when setting up a specific service one could only edit the file of that service, without concentration on specific files or a `svc_foo-setting` that gets joined as `services = [ svc_foo-setting ]`. This is suboptimal and this projects intends to solve that.
