@@ -42,14 +42,6 @@ func (r *GroupResource) Schema(_ context.Context, _ resource.SchemaRequest, resp
 				Computed:    true,
 				Description: "Stable group identifier.",
 			},
-			"name": schema.StringAttribute{
-				Required:    true,
-				Description: "Human-readable group name.",
-			},
-			"type": schema.StringAttribute{
-				Optional:    true,
-				Description: "Optional value type enforced for all items in the group.",
-			},
 			"value": schema.DynamicAttribute{
 				Computed:    true,
 				Description: "Computed value assembled from all items in the group.",
