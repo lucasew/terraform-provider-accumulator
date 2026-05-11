@@ -24,6 +24,7 @@ resource "accumulator_group" "example" {
 
 resource "accumulator_item" "item" {
     group = accumulator_group.example.id
+    key = "item"
     value = "example value"
 }
 ```
