@@ -1,5 +1,4 @@
-resource "accumulator_group" "main" { 
-}
+resource "accumulator_group" "main" {}
 
 output "expected" {
     value = {
